@@ -95,15 +95,12 @@ class TemperatureThread(Thread):
         temperature = sensor.readTempC()
         self.temphist[self.i % 5] = temperature
         avgtemp = sum(self.temphist) / len(self.temphist)
-        #print 'Thermocouple Temperature: {0:0.3F}C'.format(temperature)
-        #print round(avgtemp, 2)
         self.i += 1
-
+        
         # Print temp do display
-
-        mylcd.lcd_display_string('Set: %.1f C ' % targetT, 1)
-        mylcd.lcd_display_string('T: %.1fC P:%s %% ' % (avgtemp,
-                                 targetPwm), 2)
+        
+        mylcd.lcd_display_string('Set: %.1f C ' % round(targetT,1), 1)
+        mylcd.lcd_display_string('T: %.1fC P:%s %% ' % (round(avgtemp,1), round(targetPwm,1)), 2)
 
 
 class PIDThread(Thread):
