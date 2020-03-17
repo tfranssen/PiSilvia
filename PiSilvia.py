@@ -129,8 +129,8 @@ class PIDThread(Thread):
         global targetPwm
         global avgtemp
         global targetT
-        print (abs(targetT - avgtemp))
-        if abs(targetT - avgtemp) <= 10:
+        print (targetT - avgtemp)
+        if targetT - avgtemp <= 10:
             targetPwm = pid.output
             targetPwm = max(min(int(targetPwm), 100), 0)
             pid.update(avgtemp)
@@ -138,8 +138,13 @@ class PIDThread(Thread):
             sleep(targetPwm / 100.)
             GPIO.output(36, GPIO.LOW)  # Turn off
             sleep(1 - targetPwm / 100.)
-        else:
+        elif targetT - avgtemp > 10:
+            targetPwm = 0
             GPIO.output(36, GPIO.HIGH)  # Turn on
+            sleep(1)
+        else:
+            targetPwm = 0
+            GPIO.output(36, GPIO.LOW)  # Turn off
             sleep(1)
 
 class RotaryThread(Thread):
