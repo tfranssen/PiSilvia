@@ -139,7 +139,7 @@ class PIDThread(Thread):
             GPIO.output(36, GPIO.LOW)  # Turn off
             sleep(1 - targetPwm / 100.)
         elif targetT - avgtemp > 10:
-            targetPwm = 0
+            targetPwm = 100
             GPIO.output(36, GPIO.HIGH)  # Turn on
             sleep(1)
         else:
