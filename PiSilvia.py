@@ -95,8 +95,8 @@ class TemperatureThread(Thread):
         temperature = sensor.readTempC()
         self.temphist[self.i % 5] = temperature
         avgtemp = sum(self.temphist) / len(self.temphist)
-        print 'Thermocouple Temperature: {0:0.3F}C'.format(temperature)
-        print round(avgtemp, 2)
+        #print 'Thermocouple Temperature: {0:0.3F}C'.format(temperature)
+        #print round(avgtemp, 2)
         self.i += 1
 
         # Print temp do display
