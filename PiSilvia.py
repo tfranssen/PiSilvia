@@ -27,5 +27,5 @@ sensor = MAX6675(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE))
 print('Press Ctrl-C to quit.')
 while True:
 	temp = sensor.readTempC()
-	print('Thermocouple Temperature: {0:0.3F}°C'.format(temperature))
+	print('Thermocouple Temperature: {0:0.3F}C'.format(temperature))
 	time.sleep(1.0)
