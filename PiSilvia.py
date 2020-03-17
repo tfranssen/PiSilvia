@@ -5,4 +5,5 @@ import RPi.GPIO as GPIO  # Import Raspberry Pi GPIO library
 SPI_PORT = 0
 SPI_DEVICE = 0
 sensor = MAX6675.MAX6675(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE))
-print 'Thermocouple Temperature: {0:0.3F}°C'.format(temperature)
+temperature = sensor.readTempC()
+print 'Thermocouple Temperature: {0:0.3F}C'.format(temperature)
