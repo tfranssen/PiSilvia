@@ -7,11 +7,11 @@ SPI_PORT = 0
 SPI_DEVICE = 0
 sensor = MAX6675.MAX6675(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE))
 temphist = [0., 0., 0., 0., 0.]
-self.i = 0
+i = 0
 
 
 temperature = sensor.readTempC()
 print 'Thermocouple Temperature: {0:0.3F}C'.format(temperature)
-temphist[self.i % 5] = temperature
+temphist[i % 5] = temperature
 avgtemp = sum(temphist) / len(temphist)
 print(avgtemp)
