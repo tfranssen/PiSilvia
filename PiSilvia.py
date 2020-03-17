@@ -17,5 +17,6 @@ def readtemp():
     temphist[i % 5] = temperature
     avgtemp = sum(temphist) / len(temphist)
     print(avgtemp)
+    i += 1
 
 readtemp()
