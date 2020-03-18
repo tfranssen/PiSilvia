@@ -63,9 +63,7 @@ def on_message(client, userdata, msg):
     msg.payload = msg.payload.decode("utf-8")
     print(msg.topic+" "+str(msg.payload))
     if (msg.topic == "koffie/temp"):
-        temp = msg.payload
-    if temp.is_integer():
-        targetT = temp
+        targetT = int(msg.payload)
     print(targetT)
 
 
