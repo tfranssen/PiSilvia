@@ -70,6 +70,7 @@ def on_message(client, userdata, msg):
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
+client.on_publish = on_publish
 
 client.username_pw_set("thijs", "frans123")
 client.connect("192.168.2.5", 1883, 60)
@@ -197,6 +198,27 @@ class RotaryThread(Thread):
                 targetT -= 5
         pid.SetPoint = targetT
         clkLastState = clkState
+        
+class MQTTThread(Thread):
+
+    def __init__(self, interval):
+        self.stop_event = Event()
+        self.interval = interval
+        super(MQTTThread, self).__init__()
+
+    def run(self):
+        while not self.stop_event.is_set():
+            self.main()
+            self.stop_event.wait(self.interval)
+
+    def terminate(self):
+        self.stop_event.set()
+
+    def main(self):
+        global targetT
+        global client
+        client.publish("koffie/actualtemp",targetT)
+       
 
 
 if __name__ == '__main__':
@@ -209,6 +231,8 @@ if __name__ == '__main__':
     worker2.start()
     worker3 = PIDThread(interval=0.01)
     worker3.start()
+    worker4 = MQTTThread(interval=5)
+    worker4.start()   
     try:
         while True:
             sleep(1)
@@ -216,3 +240,6 @@ if __name__ == '__main__':
         worker.terminate()
         worker2.terminate()
         worker3.terminate()
+        worker4.terminate()        
+        client.disconnect()
+        client.loop_stop()
