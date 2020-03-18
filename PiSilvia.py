@@ -9,6 +9,8 @@ import lcd_driver
 import Adafruit_GPIO.SPI as SPI
 import RPi.GPIO as GPIO  # Import Raspberry Pi GPIO library
 import MAX6675.MAX6675 as MAX6675
+import paho.mqtt.client as mqtt
+
 
 mylcd = lcd_driver.lcd()
 
@@ -48,6 +50,35 @@ pid.SetPoint = targetT
 pid.setSampleTime(0.1)
 
 
+# The callback for when the client receives a CONNACK response from the server.
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    client.subscribe("koffie/system")
+    client.subscribe("koffie/temp")
+
+
+# The callback for when a PUBLISH message is received from the server.
+def on_message(client, userdata, msg):
+    global targetT
+    msg.payload = msg.payload.decode("utf-8")
+    print(msg.topic+" "+str(msg.payload))
+    if (msg.topic == "koffie/temp"):
+        temp = msg.payload
+    if temp.is_integer():
+        targetT = temp
+    print(targetT)
+
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+
+client.username_pw_set("thijs", "frans123")
+client.connect("192.168.2.5", 1883, 60)
+
+client.loop_start()
+
+
 def readConfig():
     global targetT
     with open('/tmp/pid.conf', 'r') as f:
@@ -80,9 +111,6 @@ class TemperatureThread(Thread):
     def run(self):
         while not self.stop_event.is_set():
             self.main()
-
-             # wait self.interval seconds or until the stop_event is set
-
             self.stop_event.wait(self.interval)
 
     def terminate(self):
@@ -96,11 +124,12 @@ class TemperatureThread(Thread):
         self.temphist[self.i % 5] = temperature
         avgtemp = sum(self.temphist) / len(self.temphist)
         self.i += 1
-        
+
         # Print temp do display
-        
-        mylcd.lcd_display_string('Set: %.1f C ' % round(targetT,1), 1)
-        mylcd.lcd_display_string('T: %.1fC P:%s %% ' % (round(avgtemp,1), round(targetPwm,1)), 2)
+
+        mylcd.lcd_display_string('Set: %.1f C ' % round(targetT, 1), 1)
+        mylcd.lcd_display_string(
+            'T: %.1fC P:%s %% ' % (round(avgtemp, 1), round(targetPwm, 1)), 2)
 
 
 class PIDThread(Thread):
@@ -113,9 +142,6 @@ class PIDThread(Thread):
     def run(self):
         while not self.stop_event.is_set():
             self.main()
-
-             # wait self.interval seconds or until the stop_event is set
-
             self.stop_event.wait(self.interval)
 
     def terminate(self):
@@ -144,6 +170,7 @@ class PIDThread(Thread):
             GPIO.output(36, GPIO.LOW)  # Turn off
             sleep(1)
 
+
 class RotaryThread(Thread):
 
     def __init__(self, interval):
@@ -154,9 +181,6 @@ class RotaryThread(Thread):
     def run(self):
         while not self.stop_event.is_set():
             self.main()
-
-             # wait self.interval seconds or until the stop_event is set
-
             self.stop_event.wait(self.interval)
 
     def terminate(self):
@@ -173,7 +197,6 @@ class RotaryThread(Thread):
                 targetT += 5
             else:
                 targetT -= 5
-            print targetT
         pid.SetPoint = targetT
         clkLastState = clkState
 
@@ -195,5 +218,3 @@ if __name__ == '__main__':
         worker.terminate()
         worker2.terminate()
         worker3.terminate()
-
-			
