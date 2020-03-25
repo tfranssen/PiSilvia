@@ -143,7 +143,7 @@ class TemperatureThread(Thread):
         print(temperature) 
         
         try:
-            mylcd.lcd_display_string('Set: %s gitC ' % round(targetT, 0), 1)
+            mylcd.lcd_display_string('Set: %sC ' % round(targetT, 0), 1)
             mylcd.lcd_display_string(
                 'T: %sC P:%s %% ' % (round(avgtemp, 0), round(targetPwm, 2)),2)
         except IOError:
