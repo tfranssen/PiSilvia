@@ -11,6 +11,8 @@ import RPi.GPIO as GPIO  # Import Raspberry Pi GPIO library
 import MAX6675.MAX6675 as MAX6675
 import paho.mqtt.client as mqtt
 
+mylcd = lcd_driver.lcd()
+
 GPIO.setwarnings(False)  # Ignore warning for now
 GPIO.setmode(GPIO.BOARD)  # Use physical pin numbering
 GPIO.setup(36, GPIO.OUT, initial=GPIO.LOW)
@@ -99,8 +101,6 @@ class LCDThread(Thread):
         self.stop_event = Event()
         self.interval = interval
         super(LCDThread, self).__init__()
-        self.mylcd = lcd_driver.lcd()
-
     def run(self):
         while not self.stop_event.is_set():
             self.main()
@@ -140,15 +140,14 @@ class TemperatureThread(Thread):
         self.temphist[self.i % 5] = temperature
         avgtemp = sum(self.temphist) / len(self.temphist)
         self.i += 1
-        print(temperature) 
-        
+        print(temperature)
         try:
-            self.mylcd.lcd_display_string('Set: %s C ' % round(targetT, 0), 1)
-            self.mylcd.lcd_display_string(
-                'T: %sC P:%s %% ' % (round(avgtemp, 0), round(targetPwm, 2)),2)
+            mylcd.lcd_display_string('Set: %iC ' % round(targetT, 0), 1)
+            mylcd.lcd_display_string(
+                'T: %iC P:%i%% ' % (round(avgtemp, 0), round(targetPwm, 0)),2)
         except IOError:
             print("LCD Write error") 
-            self.mylcd.lcd_display_string("LCD Error", 1)                 
+            mylcd.lcd_display_string("LCD Error", 1)
 
 
 class PIDThread(Thread):
