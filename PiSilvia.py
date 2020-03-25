@@ -11,9 +11,6 @@ import RPi.GPIO as GPIO  # Import Raspberry Pi GPIO library
 import MAX6675.MAX6675 as MAX6675
 import paho.mqtt.client as mqtt
 
-
-mylcd = lcd_driver.lcd()
-
 GPIO.setwarnings(False)  # Ignore warning for now
 GPIO.setmode(GPIO.BOARD)  # Use physical pin numbering
 GPIO.setup(36, GPIO.OUT, initial=GPIO.LOW)
@@ -96,6 +93,32 @@ def createConfig():
 
 createConfig()
 
+class LCDThread(Thread):
+
+    def __init__(self, interval):
+        self.stop_event = Event()
+        self.interval = interval
+        super(LCDThread, self).__init__()
+        self.mylcd = lcd_driver.lcd()
+
+    def run(self):
+        while not self.stop_event.is_set():
+            self.main()
+            self.stop_event.wait(self.interval)
+
+    def terminate(self):
+        self.stop_event.set()
+
+    def main(self):
+        # Print temp do display
+        while True:
+            try:
+                self.mylcd.lcd_display_string('Set: %s C ' % round(targetT, 0), 1)
+                self.mylcd.lcd_display_string(
+                    'T: %sC P:%s %% ' % (round(avgtemp, 0), round(targetPwm, 2)),2)
+            except IOError:
+                print("LCD Write error") 
+
 
 class TemperatureThread(Thread):
 
@@ -118,21 +141,10 @@ class TemperatureThread(Thread):
     def main(self):
         global targetPwm
         global avgtemp
-        global mylcd
         temperature = sensor.readTempC()
         self.temphist[self.i % 5] = temperature
         avgtemp = sum(self.temphist) / len(self.temphist)
-        self.i += 1
-
-        # Print temp do display
-        try:
-            mylcd.lcd_display_string('Set: %s C ' % round(targetT, 0), 1)
-            mylcd.lcd_display_string(
-                'T: %sC P:%s %% ' % (round(avgtemp, 0), round(targetPwm, 2)),2)
-        except IOError:
-            #Reinitialize LCD
-            mylcd = lcd_driver.lcd()
-            print("LCD Write error")            
+        self.i += 1          
 
 
 class PIDThread(Thread):
@@ -236,7 +248,10 @@ if __name__ == '__main__':
     worker3 = PIDThread(interval=0.01)
     worker3.start()
     worker4 = MQTTThread(interval=5)
-    worker4.start()   
+    worker4.start()
+    worker5 = LCDThread(interval=0.2)
+    worker5.start() 
+    
     try:
         while True:
             sleep(1)
@@ -244,6 +259,7 @@ if __name__ == '__main__':
         worker.terminate()
         worker2.terminate()
         worker3.terminate()
-        worker4.terminate()        
+        worker4.terminate() 
+        worker5.terminate()        
         client.disconnect()
         client.loop_stop()
