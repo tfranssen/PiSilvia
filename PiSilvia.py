@@ -111,6 +111,7 @@ class LCDThread(Thread):
 
     def main(self):
         # Print temp do display:
+        pass
 
 
 
