@@ -144,7 +144,8 @@ class TemperatureThread(Thread):
         temperature = sensor.readTempC()
         self.temphist[self.i % 5] = temperature
         avgtemp = sum(self.temphist) / len(self.temphist)
-        self.i += 1          
+        self.i += 1
+        print(avgtemp)          
 
 
 class PIDThread(Thread):
