@@ -148,7 +148,12 @@ class TemperatureThread(Thread):
                 'T: %sC P:%s %% ' % (round(avgtemp, 0), round(targetPwm, 2)),2)
         except IOError:
             print("LCD Write error") 
-            mylcd.lcd_clear()
+            try:
+                sleep(100)
+                mylcd.lcd_clear()
+            except IOError:
+                print ("Level 2 LCD error")
+                
             ##self.mylcd.lcd_display_string("LCD Error", 1)                 
 
 
