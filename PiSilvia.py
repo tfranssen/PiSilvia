@@ -110,14 +110,13 @@ class LCDThread(Thread):
         self.stop_event.set()
 
     def main(self):
-        # Print temp do display
-        while True:
-            try:
-                self.mylcd.lcd_display_string('Set: %s C ' % round(targetT, 0), 1)
-                self.mylcd.lcd_display_string(
-                    'T: %sC P:%s %% ' % (round(avgtemp, 0), round(targetPwm, 2)),2)
-            except IOError:
-                print("LCD Write error") 
+        # Print temp do display:
+        try:
+            self.mylcd.lcd_display_string('Set: %s C ' % round(targetT, 0), 1)
+            self.mylcd.lcd_display_string(
+                'T: %sC P:%s %% ' % (round(avgtemp, 0), round(targetPwm, 2)),2)
+        except IOError:
+            print("LCD Write error") 
 
 
 class TemperatureThread(Thread):
