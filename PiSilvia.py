@@ -70,7 +70,6 @@ def on_message(client, userdata, msg):
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
-client.on_publish = on_publish
 
 client.username_pw_set("thijs", "frans123")
 client.connect("192.168.2.5", 1883, 60)
