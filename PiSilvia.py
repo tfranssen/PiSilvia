@@ -155,7 +155,7 @@ class PIDThread(Thread):
         global targetPwm
         global avgtemp
         global targetT
-        print (targetT - avgtemp)
+        #print (targetT - avgtemp)
         if targetT - avgtemp <= 10:
             targetPwm = pid.output
             targetPwm = max(min(int(targetPwm), 100), 0)
