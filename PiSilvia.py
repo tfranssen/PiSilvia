@@ -127,7 +127,7 @@ class TemperatureThread(Thread):
         try:
             mylcd.lcd_display_string('Set: %s C ' % round(targetT, 0), 1)
             mylcd.lcd_display_string(
-                'T: %sC P:%s %% ' % (round(avgtemp, 0), round(targetPwm, 2),2))
+                'T: %sC P:%s %% ' % (round(avgtemp, 0), round(targetPwm, 2)),2)
         except IOError:
             print("LCD Write error")            
 
