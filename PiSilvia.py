@@ -140,21 +140,19 @@ class TemperatureThread(Thread):
         self.temphist[self.i % 5] = temperature
         avgtemp = sum(self.temphist) / len(self.temphist)
         self.i += 1
-        print(temperature) 
-        
+        print(temperature)
         try:
             mylcd.lcd_display_string('Set: %sC ' % round(targetT, 0), 1)
             mylcd.lcd_display_string(
                 'T: %sC P:%s %% ' % (round(avgtemp, 0), round(targetPwm, 2)),2)
         except IOError:
-            print("LCD Write error") 
+            print("LCD Write error")
             try:
-                sleep(100)
+                sleep(0.1)
                 mylcd.lcd_clear()
             except IOError:
                 print ("Level 2 LCD error")
-                
-            ##self.mylcd.lcd_display_string("LCD Error", 1)                 
+            ##self.mylcd.lcd_display_string("LCD Error", 1)
 
 
 class PIDThread(Thread):
